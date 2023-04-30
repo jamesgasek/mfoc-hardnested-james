@@ -90,7 +90,7 @@ typedef struct {
 extern mftag        t;
 extern mfreader    r;
 
-
+void gen_1k_dump(void* dump, FILE* outfile); //create 1k dump 
 void usage(FILE *stream, uint8_t errnr);
 void mf_init(mfreader *r);
 void mf_configure(nfc_device *pdi);

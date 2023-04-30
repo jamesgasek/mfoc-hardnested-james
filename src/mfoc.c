@@ -164,7 +164,9 @@ int main(int argc, char *const argv[])
   static mifare_classic_tag mtDump;
 
   mifare_cmd mc;
+
   FILE *pfDump = NULL;
+  FILE *fpDump = NULL;
   
   // Hardnested low memory
   bool hard_low_memory = false;
@@ -254,6 +256,10 @@ int main(int argc, char *const argv[])
         // File output
         if (!(pfDump = fopen(optarg, "wb"))) {
           fprintf(stderr, "Cannot open: %s, exiting\n", optarg);
+          exit(EXIT_FAILURE);
+        }
+        if (!(fpDump = fopen(strcat(optarg, "1k"), "wb"))) {
+          fprintf(stderr, "Cannot open: %s for making 1k file, exiting\n", optarg);
           exit(EXIT_FAILURE);
         }
         // fprintf(stdout, "Output file: %s\n", optarg);
@@ -806,13 +812,17 @@ int main(int argc, char *const argv[])
 
     // Finally save all keys + data to file
     if (pfDump) {
+      printf("Writing dump\n");
       uint16_t dump_size = (t.num_blocks + 1) * 16;
       if (fwrite(&mtDump, 1, dump_size, pfDump) != dump_size) {
         fprintf(stdout, "Error, cannot write dump\n");
         fclose(pfDump);
         goto error;
       }
+      printf("Wrote %d bytes", dump_size);
+      gen_1k_dump(&mtDump, fpDump);
       fclose(pfDump);
+      fclose(fpDump);
     }
   }
 
@@ -832,6 +842,15 @@ error:
   /* nfc_close(r.pdi);
   nfc_exit(context);
   exit(EXIT_FAILURE); */
+}
+ 
+void gen_1k_dump(void* dump, FILE* outfile)
+{
+  printf("Generating 1k dump...\n");
+  if (fwrite(dump, 1, 1024, outfile) != 1024) {
+    fprintf(stdout, "Error, cannot create 1k dump\n");
+    fclose(outfile);
+  }
 }
 
 void usage(FILE *stream, uint8_t errnr)
