@@ -1,3 +1,6 @@
+NOTE: These changes have since been merged into the original repository, from which this is forked.
+
+
 MFOC is an open source implementation of "offline nested" attack by Nethemba.
 Later was added so called "hardnested" attack by Carlo Meijer and Roel Verdult.
 
